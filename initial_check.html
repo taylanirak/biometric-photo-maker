@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Initial Check Passed</title>
+</head>
+<body>
+    <h2>Initial check passed</h2>
+    <ul>
+        <li>Face is recognized</li>
+        <li>Only one face is allowed</li>
+        <li>Minimum dimension</li>
+        <li>Correct photo proportions</li>
+    </ul>
+    <img src="{{ image_path }}" alt="Processed Photo" id="processed-photo" />
+    <button id="proceed-to-checkout">Proceed to checkout</button>
+    <button id="retake-photo">Retake photo</button>
+
+    <script>
+        document.getElementById('proceed-to-checkout').onclick = function() {
+            const imagePath = document.getElementById('processed-photo').src;
+            window.location.href = `/payment?image_path=${encodeURIComponent(imagePath)}`;
+        };
+    </script>
+</body>
+</html>
