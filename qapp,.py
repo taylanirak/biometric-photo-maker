@@ -13,8 +13,8 @@ app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = os.path.join('static', 'uploads')
 app.config['PROCESSED_FOLDER'] = os.path.join('static', 'processed')
 app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
-app.config['CROP_API_KEY'] = '5VuSdxidB7Fnwmkx8TohjjDK'
-app.config['ENHANCEMENT_API_KEY'] = 'fc1dc8291b9e4a2aa6549162c08e9274'
+app.config['CROP_API_KEY'] = ''
+app.config['ENHANCEMENT_API_KEY'] = ''
 
 predictor_path = 'C:/Users/tayla/Downloads/shape_predictor_81_face_landmarks (2).dat'
 detector = dlib.get_frontal_face_detector()
