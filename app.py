@@ -11,8 +11,8 @@ app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = os.path.join('static', 'uploads')
 app.config['PROCESSED_FOLDER'] = os.path.join('static', 'processed')
 app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
-app.config['CROP_API_KEY'] = 'wNFZFCpWksvAMTKjjPVxPAem'
-app.config['ENHANCEMENT_API_KEY'] = 'c9b248213db94f029b6bfedc75d0da8a'
+app.config['CROP_API_KEY'] = ''
+app.config['ENHANCEMENT_API_KEY'] = ''
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
