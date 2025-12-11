@@ -97,15 +97,15 @@ def upload():
         file.save(filepath)
 
         print(f"Image saved to {filepath}")
-        return jsonify({'filepath': filepath.replace('\\', '/')})
+        return jsonify({'filepath': filepath})
 
     return jsonify({'error': 'File type not allowed'}), 400
 
 @app.route('/process', methods=['POST'])
 def process():
     data = request.json
-    image_path = data['filepath'].replace('/', os.sep) # Normalize path for OS
-    
+    image_path = data['filepath']
+
     print(f"Processing image: {image_path}")
 
     
@@ -136,10 +136,7 @@ def process():
         return jsonify({'error': 'Error in image enhancement.'}), 500
     print(f"Enhanced image saved to {enhanced_image_path}")
 
-    return jsonify({
-        'processed_image_url': processed_image_path.replace('\\', '/'),
-        'enhanced_image_url': enhanced_image_path.replace('\\', '/')
-    })
+    return jsonify({'processed_image_url': processed_image_path, 'enhanced_image_url': enhanced_image_path})
 
 @app.route('/download/<filename>')
 def download_file(filename):
