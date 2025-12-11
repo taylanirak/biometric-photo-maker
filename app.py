@@ -11,8 +11,8 @@ app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = os.path.join('static', 'uploads')
 app.config['PROCESSED_FOLDER'] = os.path.join('static', 'processed')
 app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
-app.config['CROP_API_KEY'] = ''
-app.config['ENHANCEMENT_API_KEY'] = ''
+app.config['CROP_API_KEY'] = '13S43wEzX9BaNJ37rSWfx1ur'
+app.config['ENHANCEMENT_API_KEY'] = 'c9b248213db94f029b6bfedc75d0da8a'
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
@@ -97,15 +97,15 @@ def upload():
         file.save(filepath)
 
         print(f"Image saved to {filepath}")
-        return jsonify({'filepath': filepath})
+        return jsonify({'filepath': filepath.replace('\\', '/')})
 
     return jsonify({'error': 'File type not allowed'}), 400
 
 @app.route('/process', methods=['POST'])
 def process():
     data = request.json
-    image_path = data['filepath']
-
+    image_path = data['filepath'].replace('/', os.sep) # Normalize path for OS
+    
     print(f"Processing image: {image_path}")
 
     
@@ -136,15 +136,22 @@ def process():
         return jsonify({'error': 'Error in image enhancement.'}), 500
     print(f"Enhanced image saved to {enhanced_image_path}")
 
-    return jsonify({'processed_image_url': processed_image_path, 'enhanced_image_url': enhanced_image_path})
+    return jsonify({
+        'processed_image_url': processed_image_path.replace('\\', '/'),
+        'enhanced_image_url': enhanced_image_path.replace('\\', '/')
+    })
 
 @app.route('/download/<filename>')
 def download_file(filename):
     return send_from_directory(app.config['PROCESSED_FOLDER'], filename)
 
+@app.route('/payment')
+def payment():
+    return render_template('payment.html')
+
 @app.route('/thank-you')
 def thank_you():
-    return "Thank you for using our service! Your processed photo is ready for download."
+    return render_template('thank_you.html')
 
 if __name__ == '__main__':
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
