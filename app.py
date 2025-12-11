@@ -108,35 +108,41 @@ def process():
 
     print(f"Processing image: {image_path}")
 
-    
+    # Store original image path for comparison
+    original_image_url = image_path
 
+    # Detect face and crop
     cropped_image = detect_face_and_crop(image_path)
     if cropped_image is None:
-        return jsonify({'error': 'No faces detected in the uploaded image.'}), 400
+        return jsonify({'error': 'No face detected in the uploaded image. Please upload a photo with a clear, visible face.'}), 400
     print("Face detected and cropped")
 
     cropped_image_path = os.path.join(app.config['PROCESSED_FOLDER'], 'cropped_' + os.path.basename(image_path))
     cropped_image.save(cropped_image_path)
 
-
+    # Remove background
     image_no_bg = remove_background(app.config['CROP_API_KEY'], cropped_image)
     if image_no_bg is None:
-        return jsonify({'error': 'Error in background removal.'}), 500
+        return jsonify({'error': 'Failed to remove background. Please try again or check your internet connection.'}), 500
     print("Background removed")
 
-    
+    # Add white background
     final_image = add_white_background(image_no_bg)
     processed_image_path = os.path.join(app.config['PROCESSED_FOLDER'], 'processed_' + os.path.basename(image_path))
     final_image.save(processed_image_path)
     print(f"Processed image saved to {processed_image_path}")
 
-    
+    # Enhance image
     enhanced_image_path = enhance_image(app.config['ENHANCEMENT_API_KEY'], processed_image_path)
     if enhanced_image_path is None:
-        return jsonify({'error': 'Error in image enhancement.'}), 500
+        return jsonify({'error': 'Failed to enhance image. Please try again or check your internet connection.'}), 500
     print(f"Enhanced image saved to {enhanced_image_path}")
 
-    return jsonify({'processed_image_url': processed_image_path, 'enhanced_image_url': enhanced_image_path})
+    return jsonify({
+        'original_image_url': original_image_url,
+        'processed_image_url': processed_image_path,
+        'enhanced_image_url': enhanced_image_path
+    })
 
 @app.route('/download/<filename>')
 def download_file(filename):
