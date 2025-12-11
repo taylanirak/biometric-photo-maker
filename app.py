@@ -70,6 +70,35 @@ def enhance_image(enhancement_api_key, image_path):
         )
 
     if response.status_code == requests.codes.ok:
+        # Check if response is actually an image or an error JSON
+        content_type = response.headers.get('content-type', '')
+        
+        # Check if response starts with JSON (error response)
+        try:
+            # Try to decode as text to check if it's JSON
+            text_content = response.text
+            if text_content.strip().startswith('{') or text_content.strip().startswith('['):
+                # It's a JSON error response
+                import json
+                error_data = json.loads(text_content)
+                print(f"Enhancement API error: {error_data.get('msg', 'Unknown error')}")
+                return None
+        except:
+            # If it's not JSON, it should be an image
+            pass
+        
+        # Check if content-type indicates an image
+        if 'image' not in content_type.lower():
+            # Not an image, might be JSON error
+            try:
+                import json
+                error_data = json.loads(response.text)
+                print(f"Enhancement API error: {error_data.get('msg', 'Unknown error')}")
+                return None
+            except:
+                pass
+        
+        # Save the enhanced image
         enhanced_image_path = os.path.join(app.config['PROCESSED_FOLDER'], 'enhanced_' + os.path.basename(image_path))
         with open(enhanced_image_path, 'wb') as out:
             out.write(response.content)
@@ -132,11 +161,13 @@ def process():
     final_image.save(processed_image_path)
     print(f"Processed image saved to {processed_image_path}")
 
-    # Enhance image
+    # Enhance image (optional - if fails, use processed image)
     enhanced_image_path = enhance_image(app.config['ENHANCEMENT_API_KEY'], processed_image_path)
     if enhanced_image_path is None:
-        return jsonify({'error': 'Failed to enhance image. Please try again or check your internet connection.'}), 500
-    print(f"Enhanced image saved to {enhanced_image_path}")
+        print("Warning: Image enhancement failed, using processed image instead")
+        enhanced_image_path = processed_image_path
+    else:
+        print(f"Enhanced image saved to {enhanced_image_path}")
 
     return jsonify({
         'original_image_url': original_image_url,

@@ -364,7 +364,12 @@
                                 }
                                 
                                 const originalImage = processData.original_image_url || initialImage;
-                                const finalImage = processData.enhanced_image_url;
+                                // Use enhanced_image_url if available, otherwise fallback to processed_image_url
+                                const finalImage = processData.enhanced_image_url || processData.processed_image_url || initialImage;
+                                
+                                console.log('Original:', originalImage);
+                                console.log('Final:', finalImage);
+                                console.log('Process data:', processData);
                                 
                                 // Remove loading overlay
                                 document.querySelector('.processing-photo').classList.remove('loading');
