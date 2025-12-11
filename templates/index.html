@@ -67,8 +67,53 @@
         .comparison-item { flex: 1; text-align: center; }
         .comparison-item h6 { margin-bottom: 15px; font-weight: 600; color: #333; }
         .comparison-item img { width: 100%; max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .comparison-item.result-item { position: relative; }
+        .watermark-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 100px,
+                rgba(0, 0, 0, 0.03) 100px,
+                rgba(0, 0, 0, 0.03) 200px
+            );
+        }
+        .watermark-text {
+            position: absolute;
+            color: rgba(0, 0, 0, 0.3);
+            font-size: 2rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            transform: rotate(-45deg);
+            user-select: none;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+        .result-image-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+        .result-image-wrapper img {
+            user-select: none;
+            -webkit-user-drag: none;
+            -khtml-user-drag: none;
+            -moz-user-drag: none;
+            -o-user-drag: none;
+            pointer-events: none;
+        }
         @media (max-width: 768px) {
             .comparison-container { flex-direction: column; }
+            .watermark-text { font-size: 1.2rem; letter-spacing: 3px; }
         }
         .error-message { background-color: #f8d7da; color: #721c24; padding: 15px; border-radius: 5px; margin: 15px 0; border: 1px solid #f5c6cb; }
         .error-message i { margin-right: 10px; }
@@ -203,9 +248,14 @@
                             <h6>Original</h6>
                             <img id="originalPhoto" src="" alt="Original Photo" class="img-fluid" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22300%22%3E%3Crect fill=%22%23ddd%22 width=%22400%22 height=%22300%22/%3E%3Ctext fill=%22%23999%22 font-family=%22sans-serif%22 font-size=%2220%22 dy=%2210.5%22 font-weight=%22bold%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22%3EImage not found%3C/text%3E%3C/svg%3E';">
                         </div>
-                        <div class="comparison-item">
+                        <div class="comparison-item result-item">
                             <h6>Result</h6>
-                            <img id="resultPhoto" src="" alt="Result Photo" class="img-fluid" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22300%22%3E%3Crect fill=%22%23ddd%22 width=%22400%22 height=%22300%22/%3E%3Ctext fill=%22%23999%22 font-family=%22sans-serif%22 font-size=%2220%22 dy=%2210.5%22 font-weight=%22bold%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22%3EImage not found%3C/text%3E%3C/svg%3E';">
+                            <div class="result-image-wrapper" id="resultImageWrapper" oncontextmenu="return false;">
+                                <img id="resultPhoto" src="" alt="Result Photo" class="img-fluid" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22300%22%3E%3Crect fill=%22%23ddd%22 width=%22400%22 height=%22300%22/%3E%3Ctext fill=%22%23999%22 font-family=%22sans-serif%22 font-size=%2220%22 dy=%2210.5%22 font-weight=%22bold%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22%3EImage not found%3C/text%3E%3C/svg%3E';">
+                                <div class="watermark-overlay">
+                                    <div class="watermark-text">Biometric Photo Maker</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="mt-4 text-center">
@@ -386,6 +436,17 @@
                                 // Set images in result modal
                                 document.getElementById('originalPhoto').src = originalImage;
                                 document.getElementById('resultPhoto').src = finalImage;
+                                
+                                // Prevent right-click and drag on result image
+                                const resultWrapper = document.getElementById('resultImageWrapper');
+                                resultWrapper.addEventListener('contextmenu', function(e) {
+                                    e.preventDefault();
+                                    return false;
+                                });
+                                resultWrapper.addEventListener('dragstart', function(e) {
+                                    e.preventDefault();
+                                    return false;
+                                });
                                 
                                 resultModal.show();
 
